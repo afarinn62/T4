@@ -1,67 +1,53 @@
 ## User Story: SAP to Salesforce Integration
 
 ### High-Level Overview
-As a PMO, I want to facilitate the integration between SAP and Salesforce to ensure that account changes in SAP are automatically reflected in Salesforce. The integration should trigger whenever a new account is created in SAP, ensuring that all relevant account data is transferred seamlessly to Salesforce.
-
----
+As a PMO, I want an integration that allows updates from SAP to Salesforce. This integration is triggered every time a new account is created in SAP. When this occurs, an HTTP GET request is sent with the account number, after which the integration retrieves the full account data from SAP and subsequently sends this information to Salesforce's Create Account API.
 
 ### Technical Section
 
 #### Triggers:
-1. **Trigger:** Account Creation in SAP
-   - **Communication Protocol:** HTTP GET
+1. **Trigger:** Account Created in SAP
+   - **Communication Protocol:** HTTP
    - **Data Format:** JSON
-   - **Data Model:** Account number and other account details
+   - **Data Model:** Account Number, Account Details
 
-#### Backend Systems:
+#### Backend systems:
 1. **Backend System:** Salesforce
    - **Communication Protocol:** REST API
    - **Data Format:** JSON
-   - **Data Model:** Account object (including fields for account name, number, etc.)
+   - **Data Model:** Account Object (with fields such as Name, Email, Phone, Address)
 
-#### Source Systems:
+#### Source systems:
 1. **Source System:** SAP
-   - **Communication Protocol:** OData or SOAP (commonly used protocols for SAP)
-   - **Data Format:** JSON/XML (depends on the OData/SOAP format used)
-   - **Data Model:** Account object with relevant details (name, address, contact info, etc.)
+   - **Communication Protocol:** RFC or HTTP (depending on your SAP configuration, if using OData its HTTP)
+   - **Data Format:** JSON or XML (based on the data retrieval setup in SAP)
+   - **Data Model:** Account Information (including fields like Account Number, Name, Contact Details)
 
----
+### Handling Missing Information
+- The user did not specify the data model details for the source system (SAP). Please provide the specific fields included in the Account Information data model.
+- The data format for the source system (SAP) is also unclear. Please confirm if JSON or XML is being used.
 
-### Step-by-Step Flow for API Call:
-1. **Trigger Event:** New account is created in SAP.
-2. **Initiate HTTP GET Request:** 
-   - Request URL: `<SAP_base_url>/accounts/{account_number}`
-   - Method: GET
-   - Headers: `Authorization: Bearer <token>` (if required)
-3. **Receive Account Data from SAP:**
-   - Response should contain the Account details in JSON/XML format.
-4. **Prepare Data for Salesforce API:** 
-   - Map fields from SAP response to the Salesforce Account create API format.
-5. **Send Data to Salesforce:**
-   - Request URL: `<Salesforce_base_url>/services/data/vXX.X/sobjects/Account/`
-   - Method: POST
-   - Headers: 
-     - `Authorization: Bearer <token>`
-     - `Content-Type: application/json`
-   - Body: 
-     - JSON object containing the mapped fields.
-
----
+### Flow Chart
+1. **Trigger:** Account Created in SAP
+   - Send HTTP GET request containing the Account Number to the integration endpoint.
+2. **Retrieve Data:**
+   - Integration receives the Account Number and sends a request to SAP to fetch full account details using the appropriate communication protocol (RFC/HTTP).
+3. **Data Retrieval from SAP:**
+   - SAP responds with the requested full account data in the specified data format (JSON/XML).
+4. **Send Data to Salesforce:**
+   - Integration takes the retrieved account data and invokes the Salesforce Create Account API by sending an HTTP POST request.
+5. **Confirmation:**
+   - Salesforce confirms the account creation and sends a response back to the integration.
 
 ### Acceptance Criteria
-
-1. When a new account is created in SAP, the integration should trigger an HTTP GET request to fetch account details.
-2. The retrieved account data must be successfully formatted as required by Salesforce.
-3. The account creation API call to Salesforce must be successful, resulting in the creation of a new account in Salesforce.
-4. Error handling mechanisms must be in place to log failures when either the GET request fails or the Salesforce API call fails.
+- The integration must successfully trigger when an account is created in SAP.
+- It should accurately retrieve the full account data from SAP.
+- The integration must successfully send and create an account in Salesforce using the Create Account API.
+- Proper error handling must be implemented to deal with failed requests either from SAP or Salesforce.
 
 ### Dependencies
+- Access to SAP APIs/endpoints for account retrieval.
+- Access to Salesforce Create Account API.
+- Proper configurations and permissions for both SAP and Salesforce to facilitate the data exchange.
 
-- Access credentials for both SAP and Salesforce APIs.
-- Network connectivity between the systems.
-- Properly configured API endpoints in both SAP and Salesforce.
-- Valid account numbers must be provided for successful retrieval of account data from SAP.
-
----
-
-If there is any missing information regarding the communication protocol, data format, or data model for SAP or Salesforce, please provide the necessary details to finalize the user story.
+Please provide the missing data model details for SAP to finalize this user story.
